@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Tarefas - LANUP v3.0 Kanban</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header-info {
+            display: flex;
+            gap: 25px;
+            font-size: 12px;
+        }
+
+        .header-info div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header-info .number {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .btn-new-task {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-new-task:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            font-size: 14px;
+        }
+
+        .tab:hover {
+            background: #f0f0f0;
+        }
+
+        .tab.active {
+            color: #667eea;
+            background: white;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .filters {
+            padding: 15px 40px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            align-items: flex-start;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #555;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        select, input[type="text"], input[type="date"], input[type="time"] {
+            padding: 6px 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        select:hover, input:hover {
+            border-color: #667eea;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .tasks-container {
+            padding: 20px 40px;
+            max-height: calc(100vh - 350px);
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 15px;
+            align-items: start;
+        }
+
+        /* KANBAN LAYOUT */
+        .kanban-board {
+            display: none;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 20px 40px;
+            max-height: calc(100vh - 350px);
+            overflow-y: auto;
+        }
+
+        .kanban-board.active {
+            display: grid;
+        }
+
+        .kanban-column {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            min-height: 500px;
+        }
+
+        .kanban-header {
+            font-size: 14px;
+            font-weight: 700;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            color: white;
+        }
+
+        .kanban-realizar { background: #ffc107; }
+        .kanban-andamento { background: #17a2b8; }
+        .kanban-realizado { background: #28a745; }
+
+        .kanban-tasks {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 400px;
+        }
+
+        /* CARDS COMPACTOS EM COLUNAS */
+        .task-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+            cursor: grab;
+            max-width: 100%;
+        }
+
+        .task-card:active {
+            cursor: grabbing;
+        }
+
+        .task-card.dragging {
+            opacity: 0.5;
+            transform: rotate(2deg);
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+
+        .task-main-line {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .task-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .priority-badge {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 11px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .priority-1 { background: #dc3545; }
+        .priority-2 { background: #ffc107; }
+        .priority-3 { background: #28a745; }
+
+        .id-tag {
+            background: #6c757d;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 9px;
+            font-weight: 600;
+            font-family: monospace;
+            flex-shrink: 0;
+        }
+
+        .task-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            width: 100%;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .task-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .projeto-tag {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .responsavel-tag {
+            background: #667eea;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .data-tag {
+            background: #f0f0f0;
+            color: #333;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            flex-shrink: 0;
+        }
+
+        .status-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        .status-realizar { background: #fff3cd; color: #856404; }
+        .status-andamento { background: #d1ecf1; color: #0c5460; }
+        .status-realizado { background: #d4edda; color: #155724; }
+        .status-cancelado { background: #f8d7da; color: #721c24; }
+
+        .task-actions {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .btn-action {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-complete { background: #28a745; color: white; }
+        .btn-complete:hover { background: #218838; }
+        .btn-cancel { background: #ff9800; color: white; }
+        .btn-cancel:hover { background: #f57c00; }
+        .btn-edit { background: #ffc107; color: #000; }
+        .btn-edit:hover { background: #ffb300; }
+        .btn-delete { background: #dc3545; color: white; }
+        .btn-delete:hover { background: #c82333; }
+
+        .task-details {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #f0f0f0;
+            display: none;
+        }
+
+        .task-card:hover .task-details {
+            display: block;
+        }
+
+        .task-details.has-content {
+            display: block;
+        }
+
+        .task-comment {
+            color: #666;
+            font-size: 11px;
+            line-height: 1.4;
+            margin-bottom: 4px;
+        }
+
+        .task-link {
+            color: #667eea;
+            font-size: 10px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .task-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+            font-size: 22px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #333;
+            font-size: 13px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 16px;
+            grid-column: 1 / -1;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 14px;
+            grid-column: 1 / -1;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 2000;
+            animation: slideInRight 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            font-size: 13px;
+        }
+
+        .notification.success { background: #28a745; }
+        .notification.error { background: #dc3545; }
+
+        @keyframes slideInRight {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .drag-over {
+            background: #e7f3ff;
+            border: 2px dashed #667eea;
+        }
+
+        @media (max-width: 1200px) {
+            .kanban-board {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .task-main-line {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .task-actions {
+                width: 100%;
+                margin-left: 0;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Sistema de Tarefas - LANUP v3.0 Kanban</h1>
+            <div class="header-info">
+                <div>
+                    <div class="number" id="total-tasks">0</div>
+                    <div>Total</div>
+                </div>
+                <div>
+                    <div class="number" id="pending-tasks">0</div>
+                    <div>Pendentes</div>
+                </div>
+                <div>
+                    <div class="number" id="completed-tasks">0</div>
+                    <div>Concluídas</div>
+                </div>
+            </div>
+            <button class="btn-new-task" onclick="openModal()">
+                ➕ Nova Tarefa
+            </button>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="changeTab('pending', event)">
+                ⏳ Pendentes
+            </div>
+            <div class="tab" onclick="changeTab('completed', event)">
+                ✅ Concluídas
+            </div>
+            <div class="tab" onclick="changeTab('kanban', event)">
+                📊 Kanban
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label>Tarefas</label>
+                <input type="text" id="search" placeholder="REUNIÕES COM TIME" style="min-width: 200px;" onkeyup="filterAndRenderTasks()">
+            </div>
+            <div class="filter-group">
+                <label>Responsável</label>
+                <select id="filter-responsavel" onchange="filterAndRenderTasks()">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Projetos</label>
+                <select id="filter-projeto" onchange="filterAndRenderTasks()">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Período</label>
+                <input type="date" id="filter-date" onchange="filterAndRenderTasks()">
+            </div>
+            <div class="filter-group">
+                <label>Principal</label>
+                <input type="text" id="filter-principal" placeholder="Tarefa principal" style="min-width: 150px;" onkeyup="filterAndRenderTasks()">
+            </div>
+            <div class="filter-group">
+                <label>Setor</label>
+                <select id="filter-setor" onchange="filterAndRenderTasks()">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+            <button class="btn-action btn-edit" onclick="loadTasks()" style="margin-left: auto; margin-top: 20px;">
+                🔄 Atualizar
+            </button>
+        </div>
+
+        <!-- LISTA NORMAL -->
+        <div class="tasks-container" id="tasks-container">
+            <div class="loading">Carregando tarefas</div>
+        </div>
+
+        <!-- KANBAN BOARD -->
+        <div class="kanban-board" id="kanban-board">
+            <div class="kanban-column">
+                <div class="kanban-header kanban-realizar">A REALIZAR</div>
+                <div class="kanban-tasks" id="kanban-realizar" data-status="02 REALIZAR">
+                    <!-- Cards aqui -->
+                </div>
+            </div>
+            <div class="kanban-column">
+                <div class="kanban-header kanban-andamento">EM ANDAMENTO</div>
+                <div class="kanban-tasks" id="kanban-andamento" data-status="04 ANDAMENTO">
+                    <!-- Cards aqui -->
+                </div>
+            </div>
+            <div class="kanban-column">
+                <div class="kanban-header kanban-realizado">CONCLUÍDO</div>
+                <div class="kanban-tasks" id="kanban-realizado" data-status="05 REALIZADO">
+                    <!-- Cards aqui -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">➕ Nova Tarefa</h2>
+                <button class="close-modal" onclick="closeModal()">×</button>
+            </div>
+            <form id="taskForm" onsubmit="submitTask(event)">
+                <input type="hidden" id="task-id">
+                <input type="hidden" id="task-row">
+
+                <div class="form-group">
+                    <label>🎯 Projeto *</label>
+                    <input type="text" id="task-projeto" list="projetos-list" placeholder="Digite ou escolha" required>
+                    <datalist id="projetos-list">
+                        <option value="TML">
+                        <option value="INTERNO">
+                        <option value="COMERCIAL">
+                        <option value="WENDELL">
+                        <option value="FLAP">
+                        <option value="MLD">
+                    </datalist>
+                </div>
+
+                <div class="form-group">
+                    <label>📌 Tarefa Principal *</label>
+                    <input type="text" id="task-principal" placeholder="Ex: 1 ONBOARD MESSI" required>
+                </div>
+
+                <div class="form-group">
+                    <label>📝 Sub-Tarefa (Descrição) *</label>
+                    <textarea id="task-subtarefa" placeholder="Descreva a tarefa..." required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>👤 Responsável *</label>
+                        <select id="task-responsavel" required>
+                            <option value="">Selecione</option>
+                            <option value="RAQUEL">RAQUEL</option>
+                            <option value="ELLEN">ELLEN</option>
+                            <option value="KARINA">KARINA</option>
+                            <option value="FABIANO">FABIANO</option>
+                            <option value="DAVI">DAVI</option>
+                            <option value="MARCELO">MARCELO</option>
+                            <option value="MILLER">MILLER</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>🔢 Prioridade *</label>
+                        <select id="task-pontos" required>
+                            <option value="1">1 - Alta</option>
+                            <option value="2">2 - Média</option>
+                            <option value="3">3 - Baixa</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>📅 Data Limite *</label>
+                        <input type="date" id="task-data" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>⏰ Horário</label>
+                        <input type="time" id="task-hora">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>📊 Status *</label>
+                    <select id="task-status" required>
+                        <option value="02 REALIZAR">A Realizar</option>
+                        <option value="04 ANDAMENTO">Em Andamento</option>
+                        <option value="05 REALIZADO">Realizado</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>📋 Setor</label>
+                    <select id="task-setor">
+                        <option value="OPERACIONAL">OPERACIONAL</option>
+                        <option value="ADMINISTRATIVO">ADMINISTRATIVO</option>
+                        <option value="COMERCIAL">COMERCIAL</option>
+                        <option value="A DEFINIR">A DEFINIR</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>💬 Observações</label>
+                    <textarea id="task-resumo" placeholder="Notas adicionais..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>🔗 Link</label>
+                    <input type="url" id="task-link" placeholder="https://...">
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    💾 Salvar Tarefa
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwC3Wz_yBhZQ_esi0nRA2n-zda3d_ku4YNlF_sPoITCb1OzPDkz2oSur49bziGmV7U-Yw/exec';
+        
+        let allTasks = [];
+        let currentTab = 'pending';
+
+        // ==========================================
+        // CARREGAMENTO
+        // ==========================================
+
+        async function loadTasks() {
+            try {
+                showLoading();
+                const response = await fetch(`${SCRIPT_URL}?action=getTasks`, {
+                    method: 'GET',
+                    redirect: 'follow'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    allTasks = data.tasks;
+                    console.log(`${allTasks.length} tarefas carregadas`);
+                    populateFilters();
+                    filterAndRenderTasks();
+                    updateStats();
+                } else {
+                    showNotification('Erro: ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showNotification('Erro ao conectar com o servidor', 'error');
+            }
+        }
+
+        function populateFilters() {
+            const responsaveis = new Set();
+            const projetos = new Set();
+            const setores = new Set();
+            
+            allTasks.forEach(task => {
+                if (task.responsavel) responsaveis.add(task.responsavel);
+                if (task.projeto) projetos.add(task.projeto);
+                if (task.setor) setores.add(task.setor);
+            });
+
+            const respSelect = document.getElementById('filter-responsavel');
+            const projSelect = document.getElementById('filter-projeto');
+            const setorSelect = document.getElementById('filter-setor');
+            
+            respSelect.innerHTML = '<option value="">Todos</option>';
+            projSelect.innerHTML = '<option value="">Todos</option>';
+            setorSelect.innerHTML = '<option value="">Todos</option>';
+            
+            [...responsaveis].sort().forEach(r => {
+                respSelect.innerHTML += `<option value="${r}">${r}</option>`;
+            });
+            
+            [...projetos].sort().forEach(p => {
+                projSelect.innerHTML += `<option value="${p}">${p}</option>`;
+            });
+
+            [...setores].sort().forEach(s => {
+                setorSelect.innerHTML += `<option value="${s}">${s}</option>`;
+            });
+        }
+
+        // ==========================================
+        // ABAS E FILTROS
+        // ==========================================
+
+        function changeTab(tab, event) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Mostrar/ocultar containers
+            const tasksContainer = document.getElementById('tasks-container');
+            const kanbanBoard = document.getElementById('kanban-board');
+            
+            if (tab === 'kanban') {
+                tasksContainer.style.display = 'none';
+                kanbanBoard.classList.add('active');
+            } else {
+                tasksContainer.style.display = 'block';
+                kanbanBoard.classList.remove('active');
+            }
+            
+            filterAndRenderTasks();
+        }
+
+        function filterAndRenderTasks() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const responsavel = document.getElementById('filter-responsavel').value;
+            const projeto = document.getElementById('filter-projeto').value;
+            const date = document.getElementById('filter-date').value;
+            const principal = document.getElementById('filter-principal').value.toLowerCase();
+            const setor = document.getElementById('filter-setor').value;
+
+            let filtered = allTasks.filter(task => {
+                if (currentTab === 'pending' && (task.status.includes('REALIZADO') || task.status.includes('CANCELADO'))) {
+                    return false;
+                }
+                if (currentTab === 'completed' && !task.status.includes('REALIZADO')) {
+                    return false;
+                }
+
+                const matchSearch = !search || 
+                    task.subTarefa.toLowerCase().includes(search) ||
+                    task.tarefaPrincipal.toLowerCase().includes(search) ||
+                    task.responsavel.toLowerCase().includes(search);
+
+                const matchResponsavel = !responsavel || task.responsavel === responsavel;
+                const matchProjeto = !projeto || task.projeto === projeto;
+                const matchDate = !date || task.dataLimite === date;
+                const matchPrincipal = !principal || task.tarefaPrincipal.toLowerCase().includes(principal);
+                const matchSetor = !setor || task.setor === setor;
+
+                return matchSearch && matchResponsavel && matchProjeto && matchDate && matchPrincipal && matchSetor;
+            });
+
+            if (currentTab === 'kanban') {
+                renderKanban(filtered);
+            } else {
+                renderTasks(filtered);
+            }
+        }
+
+        // ==========================================
+        // RENDERIZAÇÃO LISTA
+        // ==========================================
+
+        function renderTasks(tasks) {
+            const container = document.getElementById('tasks-container');
+            
+            if (tasks.length === 0) {
+                container.innerHTML = '<div class="no-results">🔭 Nenhuma tarefa encontrada</div>';
+                return;
+            }
+
+            container.innerHTML = tasks.map(task => createTaskCard(task)).join('');
+        }
+
+        function createTaskCard(task, forKanban = false) {
+            const taskJson = JSON.stringify(task).replace(/"/g, '&quot;');
+            const hasDetails = task.resumo || task.link;
+            const draggable = forKanban ? 'draggable="true"' : '';
+            const onDrag = forKanban ? `ondragstart="drag(event)" data-task-id="${task.id}"` : '';
+            
+            return `
+            <div class="task-card" ${draggable} ${onDrag}>
+                <div class="task-main-line">
+                    <div class="task-header">
+                        <div class="priority-badge priority-${task.pontos || 2}">${task.pontos || 2}</div>
+                        <div class="id-tag">#${task.id}</div>
+                        <span class="projeto-tag">${task.projeto}</span>
+                    </div>
+                    <div class="task-title">${task.subTarefa}</div>
+                    <div class="task-tags">
+                        <span class="responsavel-tag">👤 ${task.responsavel}</span>
+                        <span class="data-tag">📅 ${formatDate(task.dataLimite)}${task.hora ? ' ⏰ ' + task.hora : ''}</span>
+                        ${!forKanban ? `<div class="status-badge ${getStatusClass(task.status)}">${getStatusText(task.status)}</div>` : ''}
+                    </div>
+                    <div class="task-actions">
+                        ${!task.status.includes('REALIZADO') && !task.status.includes('CANCELADO') ? `
+                            <button class="btn-action btn-complete" onclick='completeTask(${taskJson})' title="Concluir">✓</button>
+                            <button class="btn-action btn-cancel" onclick='cancelTask(${taskJson})' title="Cancelar">✖</button>
+                        ` : ''}
+                        <button class="btn-action btn-edit" onclick='editTask(${taskJson})' title="Editar">✏️</button>
+                        <button class="btn-action btn-delete" onclick='deleteTask(${taskJson})' title="Excluir">🗑️</button>
+                    </div>
+                </div>
+                ${hasDetails ? `
+                    <div class="task-details has-content">
+                        ${task.resumo ? `<div class="task-comment">💬 ${task.resumo}</div>` : ''}
+                        ${task.link ? `<a href="${task.link}" target="_blank" class="task-link">🔗 Abrir link</a>` : ''}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+        }
+
+        // ==========================================
+        // KANBAN
+        // ==========================================
+
+        function renderKanban(tasks) {
+            const realizar = document.getElementById('kanban-realizar');
+            const andamento = document.getElementById('kanban-andamento');
+            const realizado = document.getElementById('kanban-realizado');
+
+            realizar.innerHTML = '';
+            andamento.innerHTML = '';
+            realizado.innerHTML = '';
+
+            tasks.forEach(task => {
+                if (task.status.includes('CANCELADO')) return;
+                
+                const card = createTaskCard(task, true);
+                
+                if (task.status.includes('REALIZAR')) {
+                    realizar.innerHTML += card;
+                } else if (task.status.includes('ANDAMENTO')) {
+                    andamento.innerHTML += card;
+                } else if (task.status.includes('REALIZADO')) {
+                    realizado.innerHTML += card;
+                }
+            });
+
+            setupDragAndDrop();
+        }
+
+        function setupDragAndDrop() {
+            const columns = document.querySelectorAll('.kanban-tasks');
+            
+            columns.forEach(column => {
+                column.addEventListener('dragover', dragOver);
+                column.addEventListener('drop', drop);
+                column.addEventListener('dragenter', dragEnter);
+                column.addEventListener('dragleave', dragLeave);
+            });
+        }
+
+        function drag(event) {
+            event.dataTransfer.setData('taskId', event.target.dataset.taskId);
+            event.target.classList.add('dragging');
+        }
+
+        function dragOver(event) {
+            event.preventDefault();
+        }
+
+        function dragEnter(event) {
+            if (event.target.classList.contains('kanban-tasks')) {
+                event.target.classList.add('drag-over');
+            }
+        }
+
+        function dragLeave(event) {
+            if (event.target.classList.contains('kanban-tasks')) {
+                event.target.classList.remove('drag-over');
+            }
+        }
+
+        async function drop(event) {
+            event.preventDefault();
+            
+            const taskId = event.dataTransfer.getData('taskId');
+            const column = event.target.closest('.kanban-tasks');
+            
+            if (!column) return;
+            
+            column.classList.remove('drag-over');
+            
+            const newStatus = column.dataset.status;
+            const task = allTasks.find(t => t.id === taskId);
+            
+            if (task && task.status !== newStatus) {
+                task.status = newStatus;
+                await updateTask(task);
+                showNotification('Status atualizado!', 'success');
+            }
+            
+            document.querySelectorAll('.task-card').forEach(card => {
+                card.classList.remove('dragging');
+            });
+        }
+
+        // ==========================================
+        // AUXILIARES
+        // ==========================================
+
+        function getStatusClass(status) {
+            if (status.includes('CANCELADO')) return 'status-cancelado';
+            if (status.includes('REALIZAR')) return 'status-realizar';
+            if (status.includes('ANDAMENTO')) return 'status-andamento';
+            if (status.includes('REALIZADO')) return 'status-realizado';
+            return 'status-realizar';
+        }
+
+        function getStatusText(status) {
+            if (status.includes('CANCELADO')) return 'Cancelado';
+            if (status.includes('REALIZAR')) return 'A Realizar';
+            if (status.includes('ANDAMENTO')) return 'Andamento';
+            if (status.includes('REALIZADO')) return 'Realizado';
+            return status;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr + 'T00:00:00');
+            return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        }
+
+        function updateStats() {
+            document.getElementById('total-tasks').textContent = allTasks.length;
+            
+            const pending = allTasks.filter(t => 
+                !t.status.includes('REALIZADO') && !t.status.includes('CANCELADO')
+            ).length;
+            document.getElementById('pending-tasks').textContent = pending;
+            
+            const completed = allTasks.filter(t => 
+                t.status.includes('REALIZADO')
+            ).length;
+            document.getElementById('completed-tasks').textContent = completed;
+        }
+
+        // ==========================================
+        // AÇÕES
+        // ==========================================
+
+        async function completeTask(task) {
+            if (confirm(`Marcar como concluída?`)) {
+                task.status = '05 REALIZADO';
+                await updateTask(task);
+            }
+        }
+
+        async function cancelTask(task) {
+            if (confirm(`Cancelar esta tarefa?`)) {
+                try {
+                    const response = await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'cancelTask', task })
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        showNotification('Tarefa cancelada!', 'success');
+                        loadTasks();
+                    } else {
+                        showNotification('Erro ao cancelar', 'error');
+                    }
+                } catch (error) {
+                    showNotification('Erro ao cancelar', 'error');
+                }
+            }
+        }
+
+        async function deleteTask(task) {
+            if (confirm(`EXCLUIR permanentemente?`)) {
+                try {
+                    const response = await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'deleteTask', task })
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        showNotification('Tarefa excluída!', 'success');
+                        loadTasks();
+                    } else {
+                        showNotification('Erro ao excluir', 'error');
+                    }
+                } catch (error) {
+                    showNotification('Erro ao excluir', 'error');
+                }
+            }
+        }
+
+        // ==========================================
+        // MODAL
+        // ==========================================
+
+        function openModal(task = null) {
+            const modal = document.getElementById('taskModal');
+            const title = document.getElementById('modal-title');
+            
+            if (task) {
+                title.textContent = '✏️ Editar Tarefa';
+                document.getElementById('task-id').value = task.id || '';
+                document.getElementById('task-row').value = task.row || '';
+                document.getElementById('task-projeto').value = task.projeto || '';
+                document.getElementById('task-principal').value = task.tarefaPrincipal || '';
+                document.getElementById('task-subtarefa').value = task.subTarefa || '';
+                document.getElementById('task-responsavel').value = task.responsavel || '';
+                document.getElementById('task-pontos').value = task.pontos || '2';
+                document.getElementById('task-data').value = task.dataLimite || '';
+                document.getElementById('task-hora').value = task.hora || '';
+                document.getElementById('task-status').value = task.status || '02 REALIZAR';
+                document.getElementById('task-setor').value = task.setor || 'OPERACIONAL';
+                document.getElementById('task-resumo').value = task.resumo || '';
+                document.getElementById('task-link').value = task.link || '';
+            } else {
+                title.textContent = '➕ Nova Tarefa';
+                document.getElementById('taskForm').reset();
+                document.getElementById('task-id').value = '';
+                document.getElementById('task-row').value = '';
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('taskModal').classList.remove('active');
+        }
+
+        function editTask(task) {
+            openModal(task);
+        }
+
+        async function submitTask(event) {
+            event.preventDefault();
+            
+            const taskData = {
+                id: document.getElementById('task-id').value,
+                row: document.getElementById('task-row').value,
+                setor: document.getElementById('task-setor').value,
+                pontos: document.getElementById('task-pontos').value,
+                status: document.getElementById('task-status').value,
+                projeto: document.getElementById('task-projeto').value,
+                tarefaPrincipal: document.getElementById('task-principal').value,
+                subTarefa: document.getElementById('task-subtarefa').value,
+                responsavel: document.getElementById('task-responsavel').value,
+                dataLimite: document.getElementById('task-data').value,
+                hora: document.getElementById('task-hora').value,
+                resumo: document.getElementById('task-resumo').value,
+                link: document.getElementById('task-link').value
+            };
+
+            try {
+                const action = taskData.id ? 'updateTask' : 'createTask';
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action, task: taskData })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification(taskData.id ? 'Atualizada!' : 'Criada!', 'success');
+                    closeModal();
+                    loadTasks();
+                } else {
+                    showNotification('Erro: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showNotification('Erro ao salvar', 'error');
+            }
+        }
+
+        async function updateTask(task) {
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'updateTask', task })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showNotification('Atualizada!', 'success');
+                    loadTasks();
+                } else {
+                    showNotification('Erro', 'error');
+                }
+            } catch (error) {
+                showNotification('Erro', 'error');
+            }
+        }
+
+        // ==========================================
+        // UTILITÁRIOS
+        // ==========================================
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        function showLoading() {
+            document.getElementById('tasks-container').innerHTML = 
+                '<div class="loading">Carregando tarefas</div>';
+        }
+
+        document.getElementById('taskModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        loadTasks();
+    </script>
+</body>
+</html>
