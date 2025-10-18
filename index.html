@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Tarefas - LANUP v3.0 Kanban</title>
+    <title>Sistema de Tarefas - LANUP v4.0 ULTRA RÁPIDO</title>
     <style>
         * {
             margin: 0;
@@ -205,7 +205,7 @@
             min-height: 400px;
         }
 
-        /* CARDS COMPACTOS EM COLUNAS */
+        /* CARDS COMPACTOS */
         .task-card {
             background: white;
             border: 2px solid #e0e0e0;
@@ -230,6 +230,10 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             border-color: #667eea;
+        }
+
+        .task-card.hidden {
+            display: none;
         }
 
         .task-main-line {
@@ -395,6 +399,21 @@
 
         .task-link:hover {
             text-decoration: underline;
+        }
+
+        /* Performance indicator */
+        .perf-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-family: monospace;
+            z-index: 1000;
+            display: none;
         }
 
         /* Modal */
@@ -603,7 +622,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📋 Sistema de Tarefas - LANUP v3.0 Kanban</h1>
+            <h1>📋 Sistema de Tarefas - LANUP v4.0 ⚡</h1>
             <div class="header-info">
                 <div>
                     <div class="number" id="total-tasks">0</div>
@@ -681,22 +700,24 @@
             <div class="kanban-column">
                 <div class="kanban-header kanban-realizar">A REALIZAR</div>
                 <div class="kanban-tasks" id="kanban-realizar" data-status="02 REALIZAR">
-                    <!-- Cards aqui -->
                 </div>
             </div>
             <div class="kanban-column">
                 <div class="kanban-header kanban-andamento">EM ANDAMENTO</div>
                 <div class="kanban-tasks" id="kanban-andamento" data-status="04 ANDAMENTO">
-                    <!-- Cards aqui -->
                 </div>
             </div>
             <div class="kanban-column">
                 <div class="kanban-header kanban-realizado">CONCLUÍDO</div>
                 <div class="kanban-tasks" id="kanban-realizado" data-status="05 REALIZADO">
-                    <!-- Cards aqui -->
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Performance Indicator -->
+    <div class="perf-indicator" id="perf-indicator">
+        Cards: <span id="perf-cards">0</span> | Tempo: <span id="perf-time">0ms</span>
     </div>
 
     <!-- Modal -->
@@ -807,16 +828,69 @@
     </div>
 
     <script>
+        // ==========================================
+        // CONFIGURAÇÃO
+        // ==========================================
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwC3Wz_yBhZQ_esi0nRA2n-zda3d_ku4YNlF_sPoITCb1OzPDkz2oSur49bziGmV7U-Yw/exec';
         
         let allTasks = [];
         let currentTab = 'pending';
+        let renderedCards = new Map(); // Cache de cards renderizados
+        let isRendering = false;
+
+        // ==========================================
+        // OTIMIZAÇÃO 1: CACHE DE ELEMENTOS
+        // ==========================================
+        
+        const elements = {
+            tasksContainer: null,
+            kanbanBoard: null,
+            filterSearch: null,
+            filterResponsavel: null,
+            filterProjeto: null,
+            filterDate: null,
+            filterPrincipal: null,
+            filterSetor: null
+        };
+
+        function cacheElements() {
+            elements.tasksContainer = document.getElementById('tasks-container');
+            elements.kanbanBoard = document.getElementById('kanban-board');
+            elements.filterSearch = document.getElementById('search');
+            elements.filterResponsavel = document.getElementById('filter-responsavel');
+            elements.filterProjeto = document.getElementById('filter-projeto');
+            elements.filterDate = document.getElementById('filter-date');
+            elements.filterPrincipal = document.getElementById('filter-principal');
+            elements.filterSetor = document.getElementById('filter-setor');
+        }
+
+        // ==========================================
+        // OTIMIZAÇÃO 2: DEBOUNCE PARA FILTROS
+        // ==========================================
+        
+        let filterTimeout;
+        function debounceFilter() {
+            clearTimeout(filterTimeout);
+            filterTimeout = setTimeout(() => {
+                filterAndRenderTasks();
+            }, 300);
+        }
+
+        // Aplicar debounce nos inputs
+        document.addEventListener('DOMContentLoaded', () => {
+            cacheElements();
+            
+            elements.filterSearch.onkeyup = debounceFilter;
+            elements.filterPrincipal.onkeyup = debounceFilter;
+        });
 
         // ==========================================
         // CARREGAMENTO
         // ==========================================
 
         async function loadTasks() {
+            const startTime = performance.now();
+            
             try {
                 showLoading();
                 const response = await fetch(`${SCRIPT_URL}?action=getTasks`, {
@@ -828,10 +902,13 @@
                 
                 if (data.success) {
                     allTasks = data.tasks;
-                    console.log(`${allTasks.length} tarefas carregadas`);
+                    console.log(`✅ ${allTasks.length} tarefas carregadas em ${Math.round(performance.now() - startTime)}ms`);
+                    
                     populateFilters();
                     filterAndRenderTasks();
                     updateStats();
+                    
+                    showPerfIndicator(allTasks.length, Math.round(performance.now() - startTime));
                 } else {
                     showNotification('Erro: ' + data.message, 'error');
                 }
@@ -852,29 +929,25 @@
                 if (task.setor) setores.add(task.setor);
             });
 
-            const respSelect = document.getElementById('filter-responsavel');
-            const projSelect = document.getElementById('filter-projeto');
-            const setorSelect = document.getElementById('filter-setor');
-            
-            respSelect.innerHTML = '<option value="">Todos</option>';
-            projSelect.innerHTML = '<option value="">Todos</option>';
-            setorSelect.innerHTML = '<option value="">Todos</option>';
+            elements.filterResponsavel.innerHTML = '<option value="">Todos</option>';
+            elements.filterProjeto.innerHTML = '<option value="">Todos</option>';
+            elements.filterSetor.innerHTML = '<option value="">Todos</option>';
             
             [...responsaveis].sort().forEach(r => {
-                respSelect.innerHTML += `<option value="${r}">${r}</option>`;
+                elements.filterResponsavel.innerHTML += `<option value="${r}">${r}</option>`;
             });
             
             [...projetos].sort().forEach(p => {
-                projSelect.innerHTML += `<option value="${p}">${p}</option>`;
+                elements.filterProjeto.innerHTML += `<option value="${p}">${p}</option>`;
             });
 
             [...setores].sort().forEach(s => {
-                setorSelect.innerHTML += `<option value="${s}">${s}</option>`;
+                elements.filterSetor.innerHTML += `<option value="${s}">${s}</option>`;
             });
         }
 
         // ==========================================
-        // ABAS E FILTROS
+        // OTIMIZAÇÃO 3: FILTRAGEM E RENDERIZAÇÃO RÁPIDA
         // ==========================================
 
         function changeTab(tab, event) {
@@ -883,27 +956,29 @@
             event.target.classList.add('active');
             
             // Mostrar/ocultar containers
-            const tasksContainer = document.getElementById('tasks-container');
-            const kanbanBoard = document.getElementById('kanban-board');
-            
             if (tab === 'kanban') {
-                tasksContainer.style.display = 'none';
-                kanbanBoard.classList.add('active');
+                elements.tasksContainer.style.display = 'none';
+                elements.kanbanBoard.classList.add('active');
             } else {
-                tasksContainer.style.display = 'block';
-                kanbanBoard.classList.remove('active');
+                elements.tasksContainer.style.display = 'grid';
+                elements.kanbanBoard.classList.remove('active');
             }
             
             filterAndRenderTasks();
         }
 
         function filterAndRenderTasks() {
-            const search = document.getElementById('search').value.toLowerCase();
-            const responsavel = document.getElementById('filter-responsavel').value;
-            const projeto = document.getElementById('filter-projeto').value;
-            const date = document.getElementById('filter-date').value;
-            const principal = document.getElementById('filter-principal').value.toLowerCase();
-            const setor = document.getElementById('filter-setor').value;
+            if (isRendering) return;
+            isRendering = true;
+
+            const startTime = performance.now();
+            
+            const search = elements.filterSearch.value.toLowerCase();
+            const responsavel = elements.filterResponsavel.value;
+            const projeto = elements.filterProjeto.value;
+            const date = elements.filterDate.value;
+            const principal = elements.filterPrincipal.value.toLowerCase();
+            const setor = elements.filterSetor.value;
 
             let filtered = allTasks.filter(task => {
                 if (currentTab === 'pending' && (task.status.includes('REALIZADO') || task.status.includes('CANCELADO'))) {
@@ -930,33 +1005,67 @@
             if (currentTab === 'kanban') {
                 renderKanban(filtered);
             } else {
-                renderTasks(filtered);
+                renderTasksFast(filtered);
             }
+
+            const renderTime = Math.round(performance.now() - startTime);
+            console.log(`🚀 Renderizados ${filtered.length} cards em ${renderTime}ms`);
+            showPerfIndicator(filtered.length, renderTime);
+
+            isRendering = false;
         }
 
         // ==========================================
-        // RENDERIZAÇÃO LISTA
+        // OTIMIZAÇÃO 4: RENDERIZAÇÃO COM DOCUMENTFRAGMENT
         // ==========================================
 
-        function renderTasks(tasks) {
-            const container = document.getElementById('tasks-container');
-            
+        function renderTasksFast(tasks) {
             if (tasks.length === 0) {
-                container.innerHTML = '<div class="no-results">🔭 Nenhuma tarefa encontrada</div>';
+                elements.tasksContainer.innerHTML = '<div class="no-results">🔭 Nenhuma tarefa encontrada</div>';
                 return;
             }
 
-            container.innerHTML = tasks.map(task => createTaskCard(task)).join('');
+            // Usar DocumentFragment para evitar reflows múltiplos
+            const fragment = document.createDocumentFragment();
+            const tempDiv = document.createElement('div');
+            
+            // Renderizar até 100 cards inicialmente (lazy loading)
+            const initialBatch = tasks.slice(0, 100);
+            
+            initialBatch.forEach(task => {
+                tempDiv.innerHTML = createTaskCardHTML(task);
+                fragment.appendChild(tempDiv.firstElementChild);
+            });
+
+            elements.tasksContainer.innerHTML = '';
+            elements.tasksContainer.appendChild(fragment);
+
+            // Se houver mais de 100, carregar o resto depois
+            if (tasks.length > 100) {
+                setTimeout(() => {
+                    renderRemainingTasks(tasks.slice(100));
+                }, 100);
+            }
         }
 
-        function createTaskCard(task, forKanban = false) {
+        function renderRemainingTasks(tasks) {
+            const fragment = document.createDocumentFragment();
+            const tempDiv = document.createElement('div');
+            
+            tasks.forEach(task => {
+                tempDiv.innerHTML = createTaskCardHTML(task);
+                fragment.appendChild(tempDiv.firstElementChild);
+            });
+
+            elements.tasksContainer.appendChild(fragment);
+        }
+
+        function createTaskCardHTML(task) {
             const taskJson = JSON.stringify(task).replace(/"/g, '&quot;');
             const hasDetails = task.resumo || task.link;
-            const draggable = forKanban ? 'draggable="true"' : '';
-            const onDrag = forKanban ? `ondragstart="drag(event)" data-task-id="${task.id}"` : '';
             
             return `
-            <div class="task-card" ${draggable} ${onDrag}>
+            <div class="task-card" data-task-id="${task.id}">
                 <div class="task-main-line">
                     <div class="task-header">
                         <div class="priority-badge priority-${task.pontos || 2}">${task.pontos || 2}</div>
@@ -967,7 +1076,7 @@
                     <div class="task-tags">
                         <span class="responsavel-tag">👤 ${task.responsavel}</span>
                         <span class="data-tag">📅 ${formatDate(task.dataLimite)}${task.hora ? ' ⏰ ' + task.hora : ''}</span>
-                        ${!forKanban ? `<div class="status-badge ${getStatusClass(task.status)}">${getStatusText(task.status)}</div>` : ''}
+                        <div class="status-badge ${getStatusClass(task.status)}">${getStatusText(task.status)}</div>
                     </div>
                     <div class="task-actions">
                         ${!task.status.includes('REALIZADO') && !task.status.includes('CANCELADO') ? `
@@ -989,7 +1098,7 @@
         }
 
         // ==========================================
-        // KANBAN
+        // KANBAN (OTIMIZADO)
         // ==========================================
 
         function renderKanban(tasks) {
@@ -997,23 +1106,38 @@
             const andamento = document.getElementById('kanban-andamento');
             const realizado = document.getElementById('kanban-realizado');
 
+            // Limpar colunas
             realizar.innerHTML = '';
             andamento.innerHTML = '';
             realizado.innerHTML = '';
 
+            // Usar fragments
+            const fragmentRealizar = document.createDocumentFragment();
+            const fragmentAndamento = document.createDocumentFragment();
+            const fragmentRealizado = document.createDocumentFragment();
+            const tempDiv = document.createElement('div');
+
             tasks.forEach(task => {
                 if (task.status.includes('CANCELADO')) return;
                 
-                const card = createTaskCard(task, true);
+                tempDiv.innerHTML = createTaskCardHTML(task, true);
+                const card = tempDiv.firstElementChild;
+                card.draggable = true;
+                card.ondragstart = drag;
+                card.dataset.taskId = task.id;
                 
                 if (task.status.includes('REALIZAR')) {
-                    realizar.innerHTML += card;
+                    fragmentRealizar.appendChild(card);
                 } else if (task.status.includes('ANDAMENTO')) {
-                    andamento.innerHTML += card;
+                    fragmentAndamento.appendChild(card);
                 } else if (task.status.includes('REALIZADO')) {
-                    realizado.innerHTML += card;
+                    fragmentRealizado.appendChild(card);
                 }
             });
+
+            realizar.appendChild(fragmentRealizar);
+            andamento.appendChild(fragmentAndamento);
+            realizado.appendChild(fragmentRealizado);
 
             setupDragAndDrop();
         }
@@ -1112,6 +1236,17 @@
                 t.status.includes('REALIZADO')
             ).length;
             document.getElementById('completed-tasks').textContent = completed;
+        }
+
+        function showPerfIndicator(cards, time) {
+            const indicator = document.getElementById('perf-indicator');
+            document.getElementById('perf-cards').textContent = cards;
+            document.getElementById('perf-time').textContent = time;
+            
+            indicator.style.display = 'block';
+            setTimeout(() => {
+                indicator.style.display = 'none';
+            }, 3000);
         }
 
         // ==========================================
@@ -1277,14 +1412,18 @@
         }
 
         function showLoading() {
-            document.getElementById('tasks-container').innerHTML = 
-                '<div class="loading">Carregando tarefas</div>';
+            elements.tasksContainer.innerHTML = '<div class="loading">Carregando tarefas</div>';
         }
 
         document.getElementById('taskModal').addEventListener('click', function(e) {
             if (e.target === this) closeModal();
         });
 
+        // ==========================================
+        // INICIALIZAÇÃO
+        // ==========================================
+        
+        console.log('🚀 Sistema v4.0 ULTRA RÁPIDO iniciado');
         loadTasks();
     </script>
 </body>
