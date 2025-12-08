@@ -169,51 +169,57 @@
                         <input type="text" name="rg" id="rg">
                     </div>
                     <div class="form-group">
-                        <label>PIS</label>
-                        <input type="text" name="pis" id="pis">
-                    </div>
-                </div>
-
-                <div class="form-row cols-2">
-                    <div class="form-group">
                         <label>Data de Nascimento</label>
                         <input type="date" name="dataNascimento">
                     </div>
-                    <div class="form-group">
-                        <label>Data de Admissão</label>
-                        <input type="date" name="dataAdmissao">
-                    </div>
                 </div>
 
-                <!-- DOCUMENTOS -->
-                <div class="section-title">📄 Documentos</div>
-                
-                <div class="form-row cols-2">
-                    <div class="form-group">
-                        <label>CTPS</label>
-                        <input type="text" name="ctps">
-                    </div>
-                    <div class="form-group">
-                        <label>Matrícula</label>
-                        <input type="text" name="matricula">
-                    </div>
-                </div>
-
-                <!-- CARGO E FUNÇÃO -->
-                <div class="section-title">💼 Cargo e Função</div>
+                <!-- CARGO E ESCOLARIDADE -->
+                <div class="section-title">💼 Trabalho e Formação</div>
                 
                 <div class="form-row cols-3">
                     <div class="form-group">
-                        <label>Cargo</label>
-                        <input type="text" name="cargo">
+                        <label>Função <span class="required">*</span></label>
+                        <select name="funcao" required>
+                            <option value="">Selecione...</option>
+                            <option value="GARÇOM">GARÇOM</option>
+                            <option value="CUMIM">CUMIM</option>
+                            <option value="MAITRE">MAITRE</option>
+                            <option value="AUXILIAR COZINHA">AUXILIAR COZINHA</option>
+                            <option value="COZINHEIRO">COZINHEIRO</option>
+                            <option value="CHEFE DE COZINHA">CHEFE DE COZINHA</option>
+                            <option value="COORDENADOR">COORDENADOR</option>
+                            <option value="LÍDER DE BAR">LÍDER DE BAR</option>
+                            <option value="ATENDENTE DE BAR">ATENDENTE DE BAR</option>
+                            <option value="ESTOQUISTA">ESTOQUISTA</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label>Setor</label>
-                        <input type="text" name="setor">
+                        <label>Estado Civil</label>
+                        <select name="estadoCivil">
+                            <option value="">Selecione...</option>
+                            <option value="Solteiro">Solteiro</option>
+                            <option value="Casado">Casado</option>
+                            <option value="Divorciado">Divorciado</option>
+                            <option value="Separado">Separado</option>
+                            <option value="Viúvo">Viúvo</option>
+                            <option value="União estável">União estável</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label>Departamento</label>
-                        <input type="text" name="departamento">
+                        <label>Grau de Escolaridade</label>
+                        <select name="grauEscolaridade">
+                            <option value="">Selecione...</option>
+                            <option value="Analfabeto">Analfabeto</option>
+                            <option value="Até ensino fundamental">Até ensino fundamental</option>
+                            <option value="Até ensino médio">Até ensino médio</option>
+                            <option value="Doutorado">Doutorado</option>
+                            <option value="Ensino médio técnico">Ensino médio técnico</option>
+                            <option value="Mestrado">Mestrado</option>
+                            <option value="Pós graduado">Pós graduado</option>
+                            <option value="Superior completo">Superior completo</option>
+                            <option value="Superior incompleto">Superior incompleto</option>
+                        </select>
                     </div>
                 </div>
 
@@ -275,38 +281,27 @@
                 </div>
 
                 <!-- ACESSO SISTEMA -->
-                <div class="section-title">🔐 Acesso ao Sistema</div>
+                <div class="section-title">🔐 Acesso ao Ponto</div>
                 
-                <div class="form-row cols-3">
+                <div class="form-row">
                     <div class="form-group">
-                        <label>Senha</label>
-                        <input type="text" name="senha" placeholder="Senha para o ponto">
-                    </div>
-                    <div class="form-group">
-                        <label>PIN</label>
-                        <input type="text" name="pin" placeholder="PIN numérico">
-                    </div>
-                    <div class="form-group">
-                        <label>Foto (URL)</label>
-                        <input type="text" name="foto" placeholder="URL da foto">
+                        <label>Senha (PIN) <span style="font-size:0.9em;color:#666;">(4 dígitos para o ponto)</span></label>
+                        <input type="text" name="senha" placeholder="1234" maxlength="4" pattern="[0-9]{4}">
                     </div>
                 </div>
 
-                <!-- CAMPOS TÉCNICOS (OPCIONAIS) -->
-                <div class="section-title">⚙️ Configurações (Opcional)</div>
+                <!-- FOTO -->
+                <div class="section-title">📸 Foto do Funcionário</div>
                 
-                <div class="form-row cols-3">
+                <div class="form-row">
                     <div class="form-group">
-                        <label>ID Parâmetro</label>
-                        <input type="number" name="idParametro">
-                    </div>
-                    <div class="form-group">
-                        <label>ID Horário</label>
-                        <input type="number" name="idHorario">
-                    </div>
-                    <div class="form-group">
-                        <label>CNPJ/CPF Empregador</label>
-                        <input type="text" name="cnpjOuCpfEmpregador">
+                        <label class="photo-upload" for="foto" id="photoUploadArea" style="border: 2px dashed #667eea; border-radius: 12px; padding: 30px; text-align: center; cursor: pointer; background: #f8f9fa;">
+                            <input type="file" id="foto" name="foto" accept="image/*" style="display:none;">
+                            <div class="upload-icon" style="font-size: 3em; color: #667eea; margin-bottom: 10px;">📷</div>
+                            <div class="upload-text" style="color: #666; font-size: 1.1em;">Clique para selecionar uma foto</div>
+                            <div class="upload-hint" style="color: #999; font-size: 0.9em; margin-top: 5px;">JPG ou PNG (máx. 5MB)</div>
+                            <img class="photo-preview" id="photoPreview" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 10px; margin: 10px auto; display: none;">
+                        </label>
                     </div>
                 </div>
 
@@ -325,6 +320,29 @@
 
         // Inicializar
         document.getElementById('dataCadastro').value = new Date().toISOString();
+
+        // Preview da foto
+        const fotoInput = document.getElementById('foto');
+        const photoPreview = document.getElementById('photoPreview');
+        const photoUploadArea = document.getElementById('photoUploadArea');
+
+        fotoInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Arquivo muito grande! Máximo 5MB.');
+                    fotoInput.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    photoPreview.src = e.target.result;
+                    photoPreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
 
         // Máscaras
         document.getElementById('cpf').addEventListener('input', function(e) {
@@ -387,7 +405,17 @@
                 const data = {};
                 
                 for (let [key, value] of formData.entries()) {
-                    data[key] = value;
+                    if (key !== 'foto') {
+                        data[key] = value;
+                    }
+                }
+
+                // Converter foto para base64
+                const fotoFile = fotoInput.files[0];
+                if (fotoFile) {
+                    const base64 = await fileToBase64(fotoFile);
+                    data.fotoBase64 = base64;
+                    data.fotoNome = fotoFile.name;
                 }
 
                 console.log('Enviando dados:', data);
@@ -431,6 +459,16 @@
                 btnSubmit.textContent = 'Cadastrar Funcionário';
             }
         });
+
+        // Converter arquivo para base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
     </script>
 </body>
 </html>
