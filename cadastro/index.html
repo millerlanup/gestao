@@ -481,78 +481,91 @@
         });
 
         // Enviar formulário
-        document.getElementById('cadastroForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+document.getElementById('cadastroForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
 
-            const btnSubmit = document.getElementById('btnSubmit');
-            const successMsg = document.getElementById('successMsg');
-            const errorMsg = document.getElementById('errorMsg');
+    const btnSubmit = document.getElementById('btnSubmit');
+    const successMsg = document.getElementById('successMsg');
+    const errorMsg = document.getElementById('errorMsg');
 
-            successMsg.classList.remove('show');
-            errorMsg.classList.remove('show');
+    successMsg.classList.remove('show');
+    errorMsg.classList.remove('show');
 
-            btnSubmit.disabled = true;
-            btnSubmit.textContent = 'Cadastrando...';
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = 'Cadastrando...';
 
-            try {
-                const formData = new FormData(this);
-                const data = {};
-                
-                for (let [key, value] of formData.entries()) {
-                    if (key !== 'foto') {
-                        data[key] = value;
-                    }
-                }
+    try {
+        const formData = new FormData(this);
+        const data = {};
 
-                // Converter foto para base64
-                const fotoFile = fotoInput.files[0];
-                if (fotoFile) {
-                    const base64 = await fileToBase64(fotoFile);
-                    data.fotoBase64 = base64;
-                    data.fotoNome = fotoFile.name;
-                }
-
-                console.log('Enviando dados:', data);
-
-                const response = await fetch(WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                console.log('Status:', response.status);
-                const result = await response.json();
-                console.log('Resposta:', result);
-
-                if (response.ok && result.success) {
-                    successMsg.textContent = `✅ ${result.message || 'Cadastro realizado com sucesso!'} ${result.idEzPoint ? '(ID: ' + result.idEzPoint + ')' : ''}`;
-                    successMsg.classList.add('show');
-                    this.reset();
-                    document.getElementById('dataCadastro').value = new Date().toISOString();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-                    setTimeout(() => {
-                        successMsg.classList.remove('show');
-                    }, 8000);
-                } else {
-                    throw new Error(result.message || 'Erro na resposta do servidor');
-                }
-            } catch (error) {
-                console.error('Erro completo:', error);
-                errorMsg.textContent = `❌ ${error.message || 'Erro ao enviar cadastro'}`;
-                errorMsg.classList.add('show');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-
-                setTimeout(() => {
-                    errorMsg.classList.remove('show');
-                }, 8000);
-            } finally {
-                btnSubmit.disabled = false;
-                btnSubmit.textContent = 'Cadastrar Funcionário';
+        // monta objeto com todos os campos, exceto a foto
+        for (let [key, value] of formData.entries()) {
+            if (key !== 'foto') {
+                data[key] = value;
             }
+        }
+
+        // Converter foto para base64
+        const fotoFile = fotoInput.files[0];
+        if (fotoFile) {
+            const base64 = await fileToBase64(fotoFile);
+            data.fotoBase64 = base64;
+            data.fotoNome = fotoFile.name;
+        }
+
+        console.log('Enviando dados:', data);
+
+        const response = await fetch(WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
         });
+
+        // Lê a resposta de forma segura (pode vir vazia ou não ser JSON)
+        const rawText = await response.text();
+        let result = {};
+        try {
+            result = rawText ? JSON.parse(rawText) : {};
+        } catch (parseError) {
+            console.warn('Resposta não era JSON válido. Texto cru:', rawText);
+        }
+
+        console.log('Status:', response.status);
+        console.log('Resposta parseada:', result);
+
+        if (response.ok) {
+            const msg = result.message || 'Cadastro realizado com sucesso!';
+            const idEzPoint = result.idEzPoint ? ` (ID: ${result.idEzPoint})` : '';
+
+            successMsg.textContent = `✅ ${msg}${idEzPoint}`;
+            successMsg.classList.add('show');
+
+            this.reset();
+            document.getElementById('dataCadastro').value = new Date().toISOString();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            setTimeout(() => {
+                successMsg.classList.remove('show');
+            }, 8000);
+        } else {
+            const msg = result.message || `Erro HTTP ${response.status}`;
+            throw new Error(msg);
+        }
+
+    } catch (error) {
+        console.error('Erro completo:', error);
+        errorMsg.textContent = `❌ ${error.message || 'Erro ao enviar cadastro'}`;
+        errorMsg.classList.add('show');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        setTimeout(() => {
+            errorMsg.classList.remove('show');
+        }, 8000);
+    } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = 'Cadastrar Funcionário';
+    }
+});
 
         // Converter arquivo para base64
         function fileToBase64(file) {
