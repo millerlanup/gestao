@@ -136,8 +136,8 @@
 
             <div class="info">
                 <strong>ℹ️ Atenção:</strong>
-                Preencha todos os campos obrigatórios marcados com <span style="color: #e74c3c;">*</span><br>
-                Este cadastro será salvo na planilha E no sistema de ponto EzPoint.
+                Todos os campos são obrigatórios, incluindo a foto! Campos marcados com <span style="color: #e74c3c;">*</span><br>
+                Este cadastro será salvo na planilha com upload da foto no Google Drive.
             </div>
 
             <form id="cadastroForm">
@@ -313,15 +313,15 @@
                 </div>
 
                 <!-- FOTO -->
-                <div class="section-title">📸 Foto do Funcionário <span class="required">*</span></div>
+                <div class="section-title">📸 Foto do Funcionário</div>
                 
                 <div class="form-row">
                     <div class="form-group">
                         <label class="photo-upload" for="foto" id="photoUploadArea" style="border: 2px dashed #667eea; border-radius: 12px; padding: 30px; text-align: center; cursor: pointer; background: #f8f9fa;">
-                            <input type="file" id="foto" name="foto" accept="image/*" style="display:none;">
+                            <input type="file" id="foto" name="foto" accept="image/*" required style="display:none;">
                             <div class="upload-icon" style="font-size: 3em; color: #667eea; margin-bottom: 10px;">📷</div>
-                            <div class="upload-text" style="color: #666; font-size: 1.1em;">Clique para selecionar uma foto</div>
-                            <div class="upload-hint" style="color: #999; font-size: 0.9em; margin-top: 5px;">JPG ou PNG (máx. 5MB)</div>
+                            <div class="upload-text" style="color: #666; font-size: 1.1em;">Clique para selecionar uma foto <span class="required">*</span></div>
+                            <div class="upload-hint" style="color: #999; font-size: 0.9em; margin-top: 5px;">JPG ou PNG (máx. 5MB) - OBRIGATÓRIO</div>
                             <img class="photo-preview" id="photoPreview" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 10px; margin: 10px auto; display: none;">
                         </label>
                     </div>
@@ -400,7 +400,7 @@
 
     <script>
         // Configuração
-        const WEBHOOK_URL = 'https://n8n.hublanup.com.br/webhook/cadastro-funcionario';
+        const WEBHOOK_URL = 'https://n8n.hublanup.com.br/webhook/cadastro-funcionario-sheets';
 
         // Inicializar
         document.getElementById('dataCadastro').value = new Date().toISOString();
