@@ -122,7 +122,7 @@
     <div class="container">
         <div class="header">
             <h1>👤 Cadastro de Funcionário</h1>
-            <p>Sistema LANUP + Mag Gastronomia</p>
+            <p>Sistema LANUP + EzPoint</p>
         </div>
 
         <div class="form-content">
@@ -137,7 +137,7 @@
             <div class="info">
                 <strong>ℹ️ Atenção:</strong>
                 Preencha todos os campos obrigatórios marcados com <span style="color: #e74c3c;">*</span><br>
-                Este cadastro será salvo na planilha E no sistema de ponto Lanup.
+                Este cadastro será salvo na planilha E no sistema de ponto EzPoint.
             </div>
 
             <form id="cadastroForm">
@@ -165,12 +165,12 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>RG</label>
-                        <input type="text" name="rg" id="rg">
+                        <label>RG <span class="required">*</span></label>
+                        <input type="text" name="rg" id="rg" required>
                     </div>
                     <div class="form-group">
-                        <label>Data de Nascimento</label>
-                        <input type="date" name="dataNascimento">
+                        <label>Data de Nascimento <span class="required">*</span></label>
+                        <input type="date" name="dataNascimento" required>
                     </div>
                 </div>
 
@@ -195,8 +195,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Estado Civil</label>
-                        <select name="estadoCivil">
+                        <label>Estado Civil <span class="required">*</span></label>
+                        <select name="estadoCivil" required>
                             <option value="">Selecione...</option>
                             <option value="Solteiro">Solteiro</option>
                             <option value="Casado">Casado</option>
@@ -207,8 +207,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Grau de Escolaridade</label>
-                        <select name="grauEscolaridade">
+                        <label>Grau de Escolaridade <span class="required">*</span></label>
+                        <select name="grauEscolaridade" required>
                             <option value="">Selecione...</option>
                             <option value="Analfabeto">Analfabeto</option>
                             <option value="Até ensino fundamental">Até ensino fundamental</option>
@@ -228,16 +228,16 @@
                 
                 <div class="form-row cols-4">
                     <div class="form-group">
-                        <label>CEP</label>
-                        <input type="text" name="cep" id="cep" placeholder="00000-000">
+                        <label>CEP <span class="required">*</span></label>
+                        <input type="text" name="cep" id="cep" required placeholder="00000-000">
                     </div>
                     <div class="form-group">
-                        <label>Cidade</label>
-                        <input type="text" name="cidade" id="cidade">
+                        <label>Cidade <span class="required">*</span></label>
+                        <input type="text" name="cidade" id="cidade" required>
                     </div>
                     <div class="form-group">
-                        <label>Estado</label>
-                        <select name="estado" id="estado">
+                        <label>Estado <span class="required">*</span></label>
+                        <select name="estado" id="estado" required>
                             <option value="">Selecione...</option>
                             <option value="SP">SP</option>
                             <option value="RJ">RJ</option>
@@ -250,8 +250,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Região</label>
-                        <select name="regiao">
+                        <label>Região <span class="required">*</span></label>
+                        <select name="regiao" required>
                             <option value="">Selecione...</option>
                             <option value="Zona Sul">Zona Sul</option>
                             <option value="Zona Leste">Zona Leste</option>
@@ -268,23 +268,23 @@
 
                 <div class="form-row cols-2">
                     <div class="form-group">
-                        <label>Bairro</label>
-                        <input type="text" name="bairro" id="bairro">
+                        <label>Bairro <span class="required">*</span></label>
+                        <input type="text" name="bairro" id="bairro" required>
                     </div>
                     <div class="form-group">
-                        <label>Rua</label>
-                        <input type="text" name="rua" id="rua">
+                        <label>Rua <span class="required">*</span></label>
+                        <input type="text" name="rua" id="rua" required>
                     </div>
                 </div>
 
                 <div class="form-row cols-2">
                     <div class="form-group">
-                        <label>Número</label>
-                        <input type="text" name="numero">
+                        <label>Número <span class="required">*</span></label>
+                        <input type="text" name="numero" required>
                     </div>
                     <div class="form-group">
-                        <label>Cidade Local de Trabalho</label>
-                        <input type="text" name="cidadeLocalDeTrabalho">
+                        <label>Cidade Local de Trabalho <span class="required">*</span></label>
+                        <input type="text" name="cidadeLocalDeTrabalho" required>
                     </div>
                 </div>
 
@@ -293,12 +293,12 @@
                 
                 <div class="form-row cols-2">
                     <div class="form-group">
-                        <label>Telefone</label>
-                        <input type="tel" name="telefone" id="telefone" placeholder="(00) 00000-0000">
+                        <label>Telefone <span class="required">*</span></label>
+                        <input type="tel" name="telefone" id="telefone" required placeholder="(00) 00000-0000">
                     </div>
                     <div class="form-group">
-                        <label>E-mail</label>
-                        <input type="email" name="email">
+                        <label>E-mail <span class="required">*</span></label>
+                        <input type="email" name="email" required>
                     </div>
                 </div>
 
@@ -307,13 +307,13 @@
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Senha (PIN) <span style="font-size:0.9em;color:#666;">(4 dígitos para o ponto)</span></label>
-                        <input type="text" name="senha" placeholder="1234" maxlength="4" pattern="[0-9]{4}">
+                        <label>Senha (PIN) <span class="required">*</span> <span style="font-size:0.9em;color:#666;">(4 dígitos para o ponto)</span></label>
+                        <input type="text" name="senha" required placeholder="1234" maxlength="4" pattern="[0-9]{4}">
                     </div>
                 </div>
 
                 <!-- FOTO -->
-                <div class="section-title">📸 Foto do Funcionário</div>
+                <div class="section-title">📸 Foto do Funcionário <span class="required">*</span></div>
                 
                 <div class="form-row">
                     <div class="form-group">
@@ -332,16 +332,16 @@
                 
                 <div class="form-row cols-3">
                     <div class="form-group">
-                        <label>Nome do Responsável</label>
-                        <input type="text" name="nomeResponsavel">
+                        <label>Nome do Responsável <span class="required">*</span></label>
+                        <input type="text" name="nomeResponsavel" required>
                     </div>
                     <div class="form-group">
-                        <label>Telefone</label>
-                        <input type="tel" name="telefoneResponsavel" class="tel-mask" placeholder="(00) 00000-0000">
+                        <label>Telefone <span class="required">*</span></label>
+                        <input type="tel" name="telefoneResponsavel" class="tel-mask" required placeholder="(00) 00000-0000">
                     </div>
                     <div class="form-group">
-                        <label>Grau de Parentesco</label>
-                        <select name="grauParentesco">
+                        <label>Grau de Parentesco <span class="required">*</span></label>
+                        <select name="grauParentesco" required>
                             <option value="">Selecione...</option>
                             <option value="Mãe">Mãe</option>
                             <option value="Pai">Pai</option>
@@ -363,8 +363,8 @@
                 
                 <div class="form-row cols-2">
                     <div class="form-group">
-                        <label>Tipo de Chave PIX</label>
-                        <select name="tipoChavePix">
+                        <label>Tipo de Chave PIX <span class="required">*</span></label>
+                        <select name="tipoChavePix" required>
                             <option value="">Selecione...</option>
                             <option value="CPF">CPF</option>
                             <option value="CNPJ">CNPJ</option>
@@ -374,8 +374,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Chave PIX</label>
-                        <input type="text" name="chavePix" placeholder="Digite a chave PIX">
+                        <label>Chave PIX <span class="required">*</span></label>
+                        <input type="text" name="chavePix" required placeholder="Digite a chave PIX">
                     </div>
                 </div>
 
