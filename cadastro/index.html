@@ -250,15 +250,37 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Bairro</label>
-                        <input type="text" name="bairro" id="bairro">
+                        <label>Região</label>
+                        <select name="regiao">
+                            <option value="">Selecione...</option>
+                            <option value="Zona Sul">Zona Sul</option>
+                            <option value="Zona Leste">Zona Leste</option>
+                            <option value="Zona Norte">Zona Norte</option>
+                            <option value="Zona Oeste">Zona Oeste</option>
+                            <option value="Guarulhos">Guarulhos</option>
+                            <option value="Osasco">Osasco</option>
+                            <option value="Carapicuíba">Carapicuíba</option>
+                            <option value="Itapevi">Itapevi</option>
+                            <option value="ABC">ABC</option>
+                        </select>
                     </div>
                 </div>
 
                 <div class="form-row cols-2">
                     <div class="form-group">
+                        <label>Bairro</label>
+                        <input type="text" name="bairro" id="bairro">
+                    </div>
+                    <div class="form-group">
                         <label>Rua</label>
                         <input type="text" name="rua" id="rua">
+                    </div>
+                </div>
+
+                <div class="form-row cols-2">
+                    <div class="form-group">
+                        <label>Número</label>
+                        <input type="text" name="numero">
                     </div>
                     <div class="form-group">
                         <label>Cidade Local de Trabalho</label>
@@ -302,6 +324,68 @@
                             <div class="upload-hint" style="color: #999; font-size: 0.9em; margin-top: 5px;">JPG ou PNG (máx. 5MB)</div>
                             <img class="photo-preview" id="photoPreview" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 10px; margin: 10px auto; display: none;">
                         </label>
+                    </div>
+                </div>
+
+                <!-- CONTATO DE EMERGÊNCIA -->
+                <div class="section-title">🚨 Contato de Emergência</div>
+                
+                <div class="form-row cols-3">
+                    <div class="form-group">
+                        <label>Nome do Responsável</label>
+                        <input type="text" name="nomeResponsavel">
+                    </div>
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        <input type="tel" name="telefoneResponsavel" class="tel-mask" placeholder="(00) 00000-0000">
+                    </div>
+                    <div class="form-group">
+                        <label>Grau de Parentesco</label>
+                        <select name="grauParentesco">
+                            <option value="">Selecione...</option>
+                            <option value="Mãe">Mãe</option>
+                            <option value="Pai">Pai</option>
+                            <option value="Esposa">Esposa</option>
+                            <option value="Esposo">Esposo</option>
+                            <option value="Filho(a)">Filho(a)</option>
+                            <option value="Irmão(ã)">Irmão(ã)</option>
+                            <option value="Avô(ó)">Avô(ó)</option>
+                            <option value="Tio(a)">Tio(a)</option>
+                            <option value="Primo(a)">Primo(a)</option>
+                            <option value="Amigo(a)">Amigo(a)</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- DADOS BANCÁRIOS -->
+                <div class="section-title">💰 Dados Bancários</div>
+                
+                <div class="form-row cols-2">
+                    <div class="form-group">
+                        <label>Tipo de Chave PIX</label>
+                        <select name="tipoChavePix">
+                            <option value="">Selecione...</option>
+                            <option value="CPF">CPF</option>
+                            <option value="CNPJ">CNPJ</option>
+                            <option value="Email">Email</option>
+                            <option value="Telefone">Telefone</option>
+                            <option value="Aleatória">Chave Aleatória</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Chave PIX</label>
+                        <input type="text" name="chavePix" placeholder="Digite a chave PIX">
+                    </div>
+                </div>
+
+                <!-- OBSERVAÇÕES -->
+                <div class="section-title">📝 Observações</div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Observações Adicionais</label>
+                        <textarea name="observacoes" rows="3" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: inherit; font-size: 1em;"></textarea>
                     </div>
                 </div>
 
@@ -364,6 +448,16 @@
             value = value.replace(/(\d{2})(\d)/, '($1) $2');
             value = value.replace(/(\d{5})(\d)/, '$1-$2');
             e.target.value = value.substring(0, 15);
+        });
+
+        // Máscara para telefone responsável
+        document.querySelectorAll('.tel-mask').forEach(input => {
+            input.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                value = value.replace(/(\d{2})(\d)/, '($1) $2');
+                value = value.replace(/(\d{5})(\d)/, '$1-$2');
+                e.target.value = value.substring(0, 15);
+            });
         });
 
         // Buscar CEP
