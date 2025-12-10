@@ -54,8 +54,7 @@
         .form-group label .required { color: #e74c3c; }
         
         .form-group input,
-        .form-group select,
-        .form-group textarea {
+        .form-group select {
             width: 100%;
             padding: 12px;
             border: 2px solid #e0e0e0;
@@ -64,8 +63,7 @@
         }
         
         .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
+        .form-group select:focus {
             outline: none;
             border-color: #667eea;
         }
@@ -124,7 +122,7 @@
     <div class="container">
         <div class="header">
             <h1>👤 Cadastro de Funcionário</h1>
-            <p>Sistema LANUP + EzPointe</p>
+            <p>Sistema LANUP + Mag Gastronomia</p>
         </div>
 
         <div class="form-content">
@@ -138,8 +136,8 @@
 
             <div class="info">
                 <strong>ℹ️ Atenção:</strong>
-                Todos os campos são obrigatórios, incluindo a foto! Campos marcados com <span style="color: #e74c3c;">*</span><br>
-                Este cadastro será salvo na planilha com upload da foto no Google Drive.
+                Preencha todos os campos obrigatórios marcados com <span style="color: #e74c3c;">*</span><br>
+                Este cadastro será salvo na planilha E no sistema de ponto Lanup.
             </div>
 
             <form id="cadastroForm">
@@ -167,12 +165,12 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>RG <span class="required">*</span></label>
-                        <input type="text" name="rg" id="rg" required>
+                        <label>RG</label>
+                        <input type="text" name="rg" id="rg">
                     </div>
                     <div class="form-group">
-                        <label>Data de Nascimento <span class="required">*</span></label>
-                        <input type="date" name="dataNascimento" required>
+                        <label>Data de Nascimento</label>
+                        <input type="date" name="dataNascimento">
                     </div>
                 </div>
 
@@ -197,8 +195,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Estado Civil <span class="required">*</span></label>
-                        <select name="estadoCivil" required>
+                        <label>Estado Civil</label>
+                        <select name="estadoCivil">
                             <option value="">Selecione...</option>
                             <option value="Solteiro">Solteiro</option>
                             <option value="Casado">Casado</option>
@@ -209,8 +207,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Grau de Escolaridade <span class="required">*</span></label>
-                        <select name="grauEscolaridade" required>
+                        <label>Grau de Escolaridade</label>
+                        <select name="grauEscolaridade">
                             <option value="">Selecione...</option>
                             <option value="Analfabeto">Analfabeto</option>
                             <option value="Até ensino fundamental">Até ensino fundamental</option>
@@ -230,16 +228,16 @@
                 
                 <div class="form-row cols-4">
                     <div class="form-group">
-                        <label>CEP <span class="required">*</span></label>
-                        <input type="text" name="cep" id="cep" required placeholder="00000-000">
+                        <label>CEP</label>
+                        <input type="text" name="cep" id="cep" placeholder="00000-000">
                     </div>
                     <div class="form-group">
-                        <label>Cidade <span class="required">*</span></label>
-                        <input type="text" name="cidade" id="cidade" required>
+                        <label>Cidade</label>
+                        <input type="text" name="cidade" id="cidade">
                     </div>
                     <div class="form-group">
-                        <label>Estado <span class="required">*</span></label>
-                        <select name="estado" id="estado" required>
+                        <label>Estado</label>
+                        <select name="estado" id="estado">
                             <option value="">Selecione...</option>
                             <option value="SP">SP</option>
                             <option value="RJ">RJ</option>
@@ -252,8 +250,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Região <span class="required">*</span></label>
-                        <select name="regiao" required>
+                        <label>Região</label>
+                        <select name="regiao">
                             <option value="">Selecione...</option>
                             <option value="Zona Sul">Zona Sul</option>
                             <option value="Zona Leste">Zona Leste</option>
@@ -270,23 +268,23 @@
 
                 <div class="form-row cols-2">
                     <div class="form-group">
-                        <label>Bairro <span class="required">*</span></label>
-                        <input type="text" name="bairro" id="bairro" required>
+                        <label>Bairro</label>
+                        <input type="text" name="bairro" id="bairro">
                     </div>
                     <div class="form-group">
-                        <label>Rua <span class="required">*</span></label>
-                        <input type="text" name="rua" id="rua" required>
+                        <label>Rua</label>
+                        <input type="text" name="rua" id="rua">
                     </div>
                 </div>
 
                 <div class="form-row cols-2">
                     <div class="form-group">
-                        <label>Número <span class="required">*</span></label>
-                        <input type="text" name="numero" required>
+                        <label>Número</label>
+                        <input type="text" name="numero">
                     </div>
                     <div class="form-group">
-                        <label>Cidade Local de Trabalho <span class="required">*</span></label>
-                        <input type="text" name="cidadeLocalDeTrabalho" required>
+                        <label>Cidade Local de Trabalho</label>
+                        <input type="text" name="cidadeLocalDeTrabalho">
                     </div>
                 </div>
 
@@ -295,12 +293,12 @@
                 
                 <div class="form-row cols-2">
                     <div class="form-group">
-                        <label>Telefone <span class="required">*</span></label>
-                        <input type="tel" name="telefone" id="telefone" required placeholder="(00) 00000-0000">
+                        <label>Telefone</label>
+                        <input type="tel" name="telefone" id="telefone" placeholder="(00) 00000-0000">
                     </div>
                     <div class="form-group">
-                        <label>E-mail <span class="required">*</span></label>
-                        <input type="email" name="email" required>
+                        <label>E-mail</label>
+                        <input type="email" name="email">
                     </div>
                 </div>
 
@@ -309,8 +307,8 @@
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Senha (PIN) <span class="required">*</span> <span style="font-size:0.9em;color:#666;">(4 dígitos para o ponto)</span></label>
-                        <input type="text" name="senha" required placeholder="1234" maxlength="4" pattern="[0-9]{4}">
+                        <label>Senha (PIN) <span style="font-size:0.9em;color:#666;">(4 dígitos para o ponto)</span></label>
+                        <input type="text" name="senha" placeholder="1234" maxlength="4" pattern="[0-9]{4}">
                     </div>
                 </div>
 
@@ -320,10 +318,10 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="photo-upload" for="foto" id="photoUploadArea" style="border: 2px dashed #667eea; border-radius: 12px; padding: 30px; text-align: center; cursor: pointer; background: #f8f9fa;">
-                            <input type="file" id="foto" name="foto" accept="image/*" required style="display:none;">
+                            <input type="file" id="foto" name="foto" accept="image/*" style="display:none;">
                             <div class="upload-icon" style="font-size: 3em; color: #667eea; margin-bottom: 10px;">📷</div>
-                            <div class="upload-text" style="color: #666; font-size: 1.1em;">Clique para selecionar uma foto <span class="required">*</span></div>
-                            <div class="upload-hint" style="color: #999; font-size: 0.9em; margin-top: 5px;">JPG ou PNG (máx. 5MB) - OBRIGATÓRIO</div>
+                            <div class="upload-text" style="color: #666; font-size: 1.1em;">Clique para selecionar uma foto</div>
+                            <div class="upload-hint" style="color: #999; font-size: 0.9em; margin-top: 5px;">JPG ou PNG (máx. 5MB)</div>
                             <img class="photo-preview" id="photoPreview" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 10px; margin: 10px auto; display: none;">
                         </label>
                     </div>
@@ -334,16 +332,16 @@
                 
                 <div class="form-row cols-3">
                     <div class="form-group">
-                        <label>Nome do Responsável <span class="required">*</span></label>
-                        <input type="text" name="nomeResponsavel" required>
+                        <label>Nome do Responsável</label>
+                        <input type="text" name="nomeResponsavel">
                     </div>
                     <div class="form-group">
-                        <label>Telefone <span class="required">*</span></label>
-                        <input type="tel" name="telefoneResponsavel" class="tel-mask" required placeholder="(00) 00000-0000">
+                        <label>Telefone</label>
+                        <input type="tel" name="telefoneResponsavel" class="tel-mask" placeholder="(00) 00000-0000">
                     </div>
                     <div class="form-group">
-                        <label>Grau de Parentesco <span class="required">*</span></label>
-                        <select name="grauParentesco" required>
+                        <label>Grau de Parentesco</label>
+                        <select name="grauParentesco">
                             <option value="">Selecione...</option>
                             <option value="Mãe">Mãe</option>
                             <option value="Pai">Pai</option>
@@ -365,8 +363,8 @@
                 
                 <div class="form-row cols-2">
                     <div class="form-group">
-                        <label>Tipo de Chave PIX <span class="required">*</span></label>
-                        <select name="tipoChavePix" required>
+                        <label>Tipo de Chave PIX</label>
+                        <select name="tipoChavePix">
                             <option value="">Selecione...</option>
                             <option value="CPF">CPF</option>
                             <option value="CNPJ">CNPJ</option>
@@ -376,8 +374,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Chave PIX <span class="required">*</span></label>
-                        <input type="text" name="chavePix" required placeholder="Digite a chave PIX">
+                        <label>Chave PIX</label>
+                        <input type="text" name="chavePix" placeholder="Digite a chave PIX">
                     </div>
                 </div>
 
@@ -387,7 +385,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Observações Adicionais</label>
-                        <textarea name="observacoes" rows="3"></textarea>
+                        <textarea name="observacoes" rows="3" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: inherit; font-size: 1em;"></textarea>
                     </div>
                 </div>
 
@@ -401,10 +399,10 @@
     </div>
 
     <script>
-        // URL do webhook do n8n
+        // Configuração
         const WEBHOOK_URL = 'https://n8n.hublanup.com.br/webhook/cadastro-funcionario-sheets';
 
-        // Inicializar data de cadastro
+        // Inicializar
         document.getElementById('dataCadastro').value = new Date().toISOString();
 
         // Preview da foto
@@ -430,10 +428,7 @@
             }
         });
 
-        // Ao clicar na área tracejada abre o seletor de arquivo
-        photoUploadArea.addEventListener('click', () => fotoInput.click());
-
-        // Máscara CPF
+        // Máscaras
         document.getElementById('cpf').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
             value = value.replace(/(\d{3})(\d)/, '$1.$2');
@@ -442,14 +437,12 @@
             e.target.value = value.substring(0, 14);
         });
 
-        // Máscara CEP
         document.getElementById('cep').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
             value = value.replace(/(\d{5})(\d)/, '$1-$2');
             e.target.value = value.substring(0, 9);
         });
 
-        // Máscara telefone principal
         document.getElementById('telefone').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
             value = value.replace(/(\d{2})(\d)/, '($1) $2');
@@ -457,7 +450,7 @@
             e.target.value = value.substring(0, 15);
         });
 
-        // Máscara para telefones com classe .tel-mask
+        // Máscara para telefone responsável
         document.querySelectorAll('.tel-mask').forEach(input => {
             input.addEventListener('input', function(e) {
                 let value = e.target.value.replace(/\D/g, '');
@@ -504,8 +497,7 @@
             try {
                 const formData = new FormData(this);
                 const data = {};
-
-                // Monta objeto com todos os campos, exceto a foto
+                
                 for (let [key, value] of formData.entries()) {
                     if (key !== 'foto') {
                         data[key] = value;
@@ -524,58 +516,36 @@
 
                 const response = await fetch(WEBHOOK_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data),
-                    mode: 'cors'
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
                 });
 
-                const rawText = await response.text();
-                let result = {};
-                try {
-                    result = rawText ? JSON.parse(rawText) : {};
-                } catch (parseError) {
-                    console.warn('Resposta não era JSON válido. Texto cru:', rawText);
-                }
-
                 console.log('Status:', response.status);
-                console.log('Resposta parseada:', result);
+                const result = await response.json();
+                console.log('Resposta:', result);
 
-                if (response.ok) {
-                    const msg = result.message || 'Cadastro realizado com sucesso!';
-                    const idEzPoint = result.idEzPoint ? ` (ID: ${result.idEzPoint})` : '';
-
-                    successMsg.textContent = `✅ ${msg}${idEzPoint}`;
+                if (response.ok && result.success) {
+                    successMsg.textContent = `✅ ${result.message || 'Cadastro realizado com sucesso!'} ${result.idEzPoint ? '(ID: ' + result.idEzPoint + ')' : ''}`;
                     successMsg.classList.add('show');
-
                     this.reset();
                     document.getElementById('dataCadastro').value = new Date().toISOString();
-                    photoPreview.style.display = 'none';
-
                     window.scrollTo({ top: 0, behavior: 'smooth' });
 
                     setTimeout(() => {
                         successMsg.classList.remove('show');
                     }, 8000);
                 } else {
-                    const msg = result.message || `Erro HTTP ${response.status}`;
-                    throw new Error(msg);
+                    throw new Error(result.message || 'Erro na resposta do servidor');
                 }
-
             } catch (error) {
                 console.error('Erro completo:', error);
-
-                if (String(error).includes('Failed to fetch')) {
-                    successMsg.textContent = '✅ Cadastro enviado. Caso haja qualquer problema, a equipe será avisada.';
-                    successMsg.classList.add('show');
-                } else {
-                    errorMsg.textContent = `❌ ${error.message || 'Erro ao enviar cadastro'}`;
-                    errorMsg.classList.add('show');
-                }
-
+                errorMsg.textContent = `❌ ${error.message || 'Erro ao enviar cadastro'}`;
+                errorMsg.classList.add('show');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
 
                 setTimeout(() => {
-                    successMsg.classList.remove('show');
                     errorMsg.classList.remove('show');
                 }, 8000);
             } finally {
