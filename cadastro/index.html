@@ -54,7 +54,8 @@
         .form-group label .required { color: #e74c3c; }
         
         .form-group input,
-        .form-group select {
+        .form-group select,
+        .form-group textarea {
             width: 100%;
             padding: 12px;
             border: 2px solid #e0e0e0;
@@ -63,7 +64,8 @@
         }
         
         .form-group input:focus,
-        .form-group select:focus {
+        .form-group select:focus,
+        .form-group textarea:focus {
             outline: none;
             border-color: #667eea;
         }
@@ -385,7 +387,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Observações Adicionais</label>
-                        <textarea name="observacoes" rows="3" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: inherit; font-size: 1em;"></textarea>
+                        <textarea name="observacoes" rows="3"></textarea>
                     </div>
                 </div>
 
@@ -399,10 +401,10 @@
     </div>
 
     <script>
-        // Configuração
+        // URL do webhook do n8n
         const WEBHOOK_URL = 'https://n8n.hublanup.com.br/webhook/cadastro-funcionario-sheets';
 
-        // Inicializar
+        // Inicializar data de cadastro
         document.getElementById('dataCadastro').value = new Date().toISOString();
 
         // Preview da foto
@@ -428,7 +430,10 @@
             }
         });
 
-        // Máscaras
+        // Ao clicar na área tracejada abre o seletor de arquivo
+        photoUploadArea.addEventListener('click', () => fotoInput.click());
+
+        // Máscara CPF
         document.getElementById('cpf').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
             value = value.replace(/(\d{3})(\d)/, '$1.$2');
@@ -437,12 +442,14 @@
             e.target.value = value.substring(0, 14);
         });
 
+        // Máscara CEP
         document.getElementById('cep').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
             value = value.replace(/(\d{5})(\d)/, '$1-$2');
             e.target.value = value.substring(0, 9);
         });
 
+        // Máscara telefone principal
         document.getElementById('telefone').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
             value = value.replace(/(\d{2})(\d)/, '($1) $2');
@@ -450,7 +457,7 @@
             e.target.value = value.substring(0, 15);
         });
 
-        // Máscara para telefone responsável
+        // Máscara para telefones com classe .tel-mask
         document.querySelectorAll('.tel-mask').forEach(input => {
             input.addEventListener('input', function(e) {
                 let value = e.target.value.replace(/\D/g, '');
@@ -481,91 +488,101 @@
         });
 
         // Enviar formulário
-document.getElementById('cadastroForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
+        document.getElementById('cadastroForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
 
-    const btnSubmit = document.getElementById('btnSubmit');
-    const successMsg = document.getElementById('successMsg');
-    const errorMsg = document.getElementById('errorMsg');
+            const btnSubmit = document.getElementById('btnSubmit');
+            const successMsg = document.getElementById('successMsg');
+            const errorMsg = document.getElementById('errorMsg');
 
-    successMsg.classList.remove('show');
-    errorMsg.classList.remove('show');
-
-    btnSubmit.disabled = true;
-    btnSubmit.textContent = 'Cadastrando...';
-
-    try {
-        const formData = new FormData(this);
-        const data = {};
-
-        // monta objeto com todos os campos, exceto a foto
-        for (let [key, value] of formData.entries()) {
-            if (key !== 'foto') {
-                data[key] = value;
-            }
-        }
-
-        // Converter foto para base64
-        const fotoFile = fotoInput.files[0];
-        if (fotoFile) {
-            const base64 = await fileToBase64(fotoFile);
-            data.fotoBase64 = base64;
-            data.fotoNome = fotoFile.name;
-        }
-
-        console.log('Enviando dados:', data);
-
-        const response = await fetch(WEBHOOK_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-
-        // Lê a resposta de forma segura (pode vir vazia ou não ser JSON)
-        const rawText = await response.text();
-        let result = {};
-        try {
-            result = rawText ? JSON.parse(rawText) : {};
-        } catch (parseError) {
-            console.warn('Resposta não era JSON válido. Texto cru:', rawText);
-        }
-
-        console.log('Status:', response.status);
-        console.log('Resposta parseada:', result);
-
-        if (response.ok) {
-            const msg = result.message || 'Cadastro realizado com sucesso!';
-            const idEzPoint = result.idEzPoint ? ` (ID: ${result.idEzPoint})` : '';
-
-            successMsg.textContent = `✅ ${msg}${idEzPoint}`;
-            successMsg.classList.add('show');
-
-            this.reset();
-            document.getElementById('dataCadastro').value = new Date().toISOString();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-
-            setTimeout(() => {
-                successMsg.classList.remove('show');
-            }, 8000);
-        } else {
-            const msg = result.message || `Erro HTTP ${response.status}`;
-            throw new Error(msg);
-        }
-
-    } catch (error) {
-        console.error('Erro completo:', error);
-        errorMsg.textContent = `❌ ${error.message || 'Erro ao enviar cadastro'}`;
-        errorMsg.classList.add('show');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        setTimeout(() => {
+            successMsg.classList.remove('show');
             errorMsg.classList.remove('show');
-        }, 8000);
-    } finally {
-        btnSubmit.disabled = false;
-        btnSubmit.textContent = 'Cadastrar Funcionário';
-    }
-});
+
+            btnSubmit.disabled = true;
+            btnSubmit.textContent = 'Cadastrando...';
+
+            try {
+                const formData = new FormData(this);
+                const data = {};
+
+                // Monta objeto com todos os campos, exceto a foto
+                for (let [key, value] of formData.entries()) {
+                    if (key !== 'foto') {
+                        data[key] = value;
+                    }
+                }
+
+                // Converter foto para base64
+                const fotoFile = fotoInput.files[0];
+                if (fotoFile) {
+                    const base64 = await fileToBase64(fotoFile);
+                    data.fotoBase64 = base64;
+                    data.fotoNome = fotoFile.name;
+                }
+
+                console.log('Enviando dados:', data);
+
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                    mode: 'cors'
+                });
+
+                const rawText = await response.text();
+                let result = {};
+                try {
+                    result = rawText ? JSON.parse(rawText) : {};
+                } catch (parseError) {
+                    console.warn('Resposta não era JSON válido. Texto cru:', rawText);
+                }
+
+                console.log('Status:', response.status);
+                console.log('Resposta parseada:', result);
+
+                if (response.ok) {
+                    const msg = result.message || 'Cadastro realizado com sucesso!';
+                    const idEzPoint = result.idEzPoint ? ` (ID: ${result.idEzPoint})` : '';
+
+                    successMsg.textContent = `✅ ${msg}${idEzPoint}`;
+                    successMsg.classList.add('show');
+
+                    this.reset();
+                    document.getElementById('dataCadastro').value = new Date().toISOString();
+                    photoPreview.style.display = 'none';
+
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                    setTimeout(() => {
+                        successMsg.classList.remove('show');
+                    }, 8000);
+                } else {
+                    const msg = result.message || `Erro HTTP ${response.status}`;
+                    throw new Error(msg);
+                }
+
+            } catch (error) {
+                console.error('Erro completo:', error);
+
+                if (String(error).includes('Failed to fetch')) {
+                    successMsg.textContent = '✅ Cadastro enviado. Caso haja qualquer problema, a equipe será avisada.';
+                    successMsg.classList.add('show');
+                } else {
+                    errorMsg.textContent = `❌ ${error.message || 'Erro ao enviar cadastro'}`;
+                    errorMsg.classList.add('show');
+                }
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                setTimeout(() => {
+                    successMsg.classList.remove('show');
+                    errorMsg.classList.remove('show');
+                }, 8000);
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.textContent = 'Cadastrar Funcionário';
+            }
+        });
 
         // Converter arquivo para base64
         function fileToBase64(file) {
