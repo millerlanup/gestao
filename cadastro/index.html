@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Funcionário - LANUP</title>
+    <title>Cadastro de Pessoal - LANUP</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -121,8 +121,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>👤 Cadastro de Funcionário</h1>
-            <p>Sistema LANUP + MAG</p>
+            <h1>Cadastro de Pessoal</h1>
+            <p>MAG Gastronomia - Sistema Lanup</p>
         </div>
 
         <div class="form-content">
@@ -136,8 +136,8 @@
 
             <div class="info">
                 <strong>ℹ️ Atenção:</strong>
-                Preencha todos os campos obrigatórios marcados com <span style="color: #e74c3c;">*</span><br>
-                Este cadastro será salvo na planilha E no sistema de ponto EzPoint.
+                Todos os campos são obrigatórios <span style="color: #e74c3c;">*</span><br>
+                Este cadastro será salvo no sistema Lanup em parceria com a <span style="color: #e74c3c;">Mag gastronomia</span><br>.
             </div>
 
             <form id="cadastroForm">
@@ -283,7 +283,7 @@
                         <input type="text" name="numero" required>
                     </div>
                     <div class="form-group">
-                        <label>Cidade Local de Trabalho <span class="required">*</span></label>
+                        <label>Cidade que nasceu <span class="required">*</span></label>
                         <input type="text" name="cidadeLocalDeTrabalho" required>
                     </div>
                 </div>
@@ -307,13 +307,13 @@
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Senha (PIN) <span class="required">*</span> <span style="font-size:0.9em;color:#666;">(4 dígitos para o ponto)</span></label>
+                        <label>Senha para o APP <span class="required">Lanup Ponto</span> <span style="font-size:0.9em;color:#666;">(Exemplo 1234)</span></label>
                         <input type="text" name="senha" required placeholder="1234" maxlength="4" pattern="[0-9]{4}">
                     </div>
                 </div>
 
                 <!-- FOTO -->
-                <div class="section-title">📸 Foto do Funcionário <span class="required">*</span></div>
+                <div class="section-title">📸 Foto para Facial <span class="required">*</span> <span style="font-size:0.9em;color:#666;">Atenção: Foto 3x4 | Selfie | Essa foto é para realização de checkin facial</span></div>
                 
                 <div class="form-row">
                     <div class="form-group">
@@ -321,7 +321,7 @@
                             <input type="file" id="foto" name="foto" accept="image/*" style="display:none;">
                             <div class="upload-icon" style="font-size: 3em; color: #667eea; margin-bottom: 10px;">📷</div>
                             <div class="upload-text" style="color: #666; font-size: 1.1em;">Clique para selecionar uma foto</div>
-                            <div class="upload-hint" style="color: #999; font-size: 0.9em; margin-top: 5px;">JPG ou PNG (máx. 5MB)</div>
+                            <div class="upload-hint" style="color: #999; font-size: 0.9em; margin-top: 5px;">Selfie com fundo claro </div>
                             <img class="photo-preview" id="photoPreview" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 10px; margin: 10px auto; display: none;">
                         </label>
                     </div>
@@ -332,7 +332,7 @@
                 
                 <div class="form-row cols-3">
                     <div class="form-group">
-                        <label>Nome do Responsável <span class="required">*</span></label>
+                        <label>Nome do Contato <span class="required">*</span></label>
                         <input type="text" name="nomeResponsavel" required>
                     </div>
                     <div class="form-group">
@@ -550,7 +550,7 @@
                 }, 8000);
             } finally {
                 btnSubmit.disabled = false;
-                btnSubmit.textContent = 'Cadastrar Funcionário';
+                btnSubmit.textContent = 'Cadastrar';
             }
         });
 
